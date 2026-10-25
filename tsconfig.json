@@ -8,5 +8,12 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "backend/src",
+    "backend/scripts",
+    "frontend/serve.ts",
+    "e2e",
+    "playwright.config.ts"
+  ]
 }

@@ -1,10 +1,19 @@
 {
-  "name": "hello-there",
+  "name": "bun-test-app",
   "private": true,
-  "workspaces": ["backend", "frontend"],
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
     "dev": "bun run --filter backend --filter frontend dev",
     "dev:backend": "bun run --filter backend dev",
-    "dev:frontend": "bun run --filter frontend dev"
+    "dev:frontend": "bun run --filter frontend dev",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
   }
 }
