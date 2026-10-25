@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hello there</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>Hello there</h1>
+      <form id="login-form">
+        <label>
+          Username
+          <input name="username" type="text" autocomplete="username" required autofocus />
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <p id="error" class="error" role="alert" hidden></p>
+        <button type="submit">Log in</button>
+      </form>
+    </main>
+    <script type="module" src="js/login.js"></script>
+  </body>
+</html>

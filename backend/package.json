@@ -1,0 +1,13 @@
+{
+  "name": "backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "create-admin": "bun scripts/create-admin.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
