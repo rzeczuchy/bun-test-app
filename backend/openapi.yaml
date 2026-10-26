@@ -9,7 +9,7 @@ info:
     **Authentication**
 
     - Log in with `POST /api/auth/login` to get an access token, then send it as
-      `Authorization: Bearer <token>` (use the **Authorize** button above).
+      `Authorization: Bearer <token>`.
     - `POST /api/admin/users` does not use a token. It takes the admin's username and
       password as HTTP Basic auth.
 
