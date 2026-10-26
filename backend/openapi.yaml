@@ -1,0 +1,301 @@
+openapi: 3.0.3
+
+info:
+  title: bun test app API
+  version: 1.0.0
+  description: |
+    REST API for the bun test app.
+
+    **Authentication**
+
+    - Log in with `POST /api/auth/login` to get an access token, then send it as
+      `Authorization: Bearer <token>` (use the **Authorize** button above).
+    - `POST /api/admin/users` does not use a token. It takes the admin's username and
+      password as HTTP Basic auth.
+
+servers:
+  - url: http://localhost:3001
+    description: Local development
+
+tags:
+  - name: Auth
+    description: Log in, log out, register and inspect the current session
+  - name: Admin
+    description: Endpoints that require admin credentials
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      description: Exchanges a username and password for an access token.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              username: alice
+              password: correct-horse-battery
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Username or password missing, or the body is not valid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Username and password are required
+        "401":
+          description: Wrong username or password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Invalid username or password
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      description: |
+        Creates a regular user account. Can be switched off on the server with
+        `ALLOW_PUBLIC_REGISTRATION=false`, in which case it returns 403.
+        Usernames are case-insensitive.
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUser"
+            example:
+              username: alice
+              password: correct-horse-battery
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          description: Public registration is disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Registration is disabled
+        "409":
+          $ref: "#/components/responses/UsernameTaken"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the current user
+      description: Returns the user that the access token belongs to. Also a quick way to check that a token is still valid.
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Log out
+      description: |
+        Revokes the access token on the server. Always returns 204, including when
+        the token is missing, expired or already revoked, so it is safe to call twice.
+      operationId: logout
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        "204":
+          description: Token revoked (or there was nothing to revoke)
+
+  /api/admin/users:
+    post:
+      tags: [Admin]
+      summary: Register a user as admin
+      description: |
+        Creates a regular user account. The request must be authorized with the
+        admin's username and password (HTTP Basic auth). Works even when public
+        registration is disabled.
+      operationId: adminCreateUser
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUser"
+            example:
+              username: bob
+              password: another-long-password
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          description: Missing or wrong admin credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Admin credentials required (HTTP Basic auth)
+        "403":
+          description: The credentials are valid, but the user is not an admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Forbidden
+        "409":
+          $ref: "#/components/responses/UsernameTaken"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Access token returned by `POST /api/auth/login`.
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Admin username and password.
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+
+    NewUser:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          pattern: "^[A-Za-z0-9_.-]{3,32}$"
+          description: 3-32 characters - letters, numbers, dot, dash or underscore.
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+
+    User:
+      type: object
+      required: [id, username, role]
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: alice
+        role:
+          type: string
+          enum: [user, admin]
+
+    UserResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+
+    LoginResponse:
+      type: object
+      required: [accessToken, tokenType, expiresAt, user]
+      properties:
+        accessToken:
+          type: string
+          description: "Opaque token. Send it as `Authorization: Bearer <accessToken>`."
+        tokenType:
+          type: string
+          enum: [Bearer]
+        expiresAt:
+          type: integer
+          description: Expiry time as a Unix timestamp in seconds.
+          example: 1793000000
+        user:
+          $ref: "#/components/schemas/User"
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+  responses:
+    ValidationError:
+      description: Invalid username or password format, or the body is not valid JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Password must be 8-128 characters
+
+    UsernameTaken:
+      description: A user with that username already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Username is already taken
+
+    Unauthorized:
+      description: Missing, expired or revoked access token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Unauthorized
+
+    PayloadTooLarge:
+      description: Request body is larger than 16 KB. Rejected by the server before it reaches the API code, so there is no JSON body.
