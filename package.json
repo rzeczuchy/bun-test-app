@@ -9,7 +9,8 @@
     "dev": "bun run --filter backend --filter frontend dev",
     "dev:backend": "bun run --filter backend dev",
     "dev:frontend": "bun run --filter frontend dev",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

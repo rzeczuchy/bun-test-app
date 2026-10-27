@@ -46,17 +46,34 @@ const now = () => Math.floor(Date.now() / 1000);
 
 export function findUserByUsername(username: string): UserWithHash | null {
   const row = db
-    .query("SELECT id, username, role, password_hash FROM users WHERE username = ?")
+    .query(
+      "SELECT id, username, role, password_hash FROM users WHERE username = ?",
+    )
     .get(username);
   return (row as UserWithHash | null) ?? null;
 }
 
-export function createUser(username: string, passwordHash: string, role: Role = "user"): User {
+export function createUser(
+  username: string,
+  passwordHash: string,
+  role: Role = "user",
+): User {
   return db
     .query(
       "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?) RETURNING id, username, role",
     )
     .get(username, passwordHash, role) as User;
+}
+
+export type DeleteUserResult = "deleted" | "not_found" | "is_admin";
+
+export function deleteUserByUsername(username: string): DeleteUserResult {
+  const { changes } = db
+    .query("DELETE FROM users WHERE username = ? AND role != 'admin'")
+    .run(username);
+
+  if (changes > 0) return "deleted";
+  return findUserByUsername(username) ? "is_admin" : "not_found";
 }
 
 export function upsertAdmin(username: string, passwordHash: string): void {
@@ -67,17 +84,21 @@ export function upsertAdmin(username: string, passwordHash: string): void {
 }
 
 export function adminExists(): boolean {
-  return Boolean(db.query("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").get());
+  return Boolean(
+    db.query("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").get(),
+  );
 }
 
 // ---- sessions ----
 
-export function createSession(tokenHash: string, userId: number, expiresAt: number): void {
-  db.query("INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)").run(
-    tokenHash,
-    userId,
-    expiresAt,
-  );
+export function createSession(
+  tokenHash: string,
+  userId: number,
+  expiresAt: number,
+): void {
+  db.query(
+    "INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)",
+  ).run(tokenHash, userId, expiresAt);
 }
 
 export function findUserBySession(tokenHash: string): User | null {

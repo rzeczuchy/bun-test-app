@@ -188,6 +188,59 @@ paths:
         "413":
           $ref: "#/components/responses/PayloadTooLarge"
 
+    delete:
+      tags: [Admin]
+      summary: Delete a user as admin
+      description: |
+        Deletes the account named in the `username` query parameter, together with
+        all of that user's active access tokens. Admin accounts cannot be deleted.
+        Must be authorized with the admin's username and password (HTTP Basic auth).
+      operationId: adminDeleteUser
+      security:
+        - basicAuth: []
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+          example: bob
+      responses:
+        "204":
+          description: User deleted
+        "400":
+          description: The username query parameter is missing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Query parameter 'username' is required
+        "401":
+          description: Missing or wrong admin credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Admin credentials required (HTTP Basic auth)
+        "403":
+          description: The credentials are valid but not an admin's, or the target is an admin account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Admin accounts cannot be deleted
+        "404":
+          description: No user with that username
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: User not found
+
 components:
   securitySchemes:
     bearerAuth:

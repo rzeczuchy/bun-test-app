@@ -1,0 +1,23 @@
+info:
+  name: Delete-user (non-admin)
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/admin/users?username={{testUser}}"
+  params:
+    - name: username
+      value: "{{testUser}}"
+      type: query
+  auth:
+    type: basic
+    username: not-admin-user
+    password: somepass123
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

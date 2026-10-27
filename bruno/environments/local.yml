@@ -4,16 +4,11 @@ variables:
     value: http://localhost:3001
   - secret: true
     name: testUser
-    description: ""
   - secret: true
     name: testPassword
-    description: ""
   - secret: true
     name: testAccessToken
-    description: ""
   - secret: true
     name: adminUser
-    description: ""
   - secret: true
     name: adminPassword
-    description: ""

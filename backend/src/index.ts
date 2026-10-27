@@ -1,7 +1,7 @@
 import { config } from "./config";
 import { adminExists, purgeExpiredSessions } from "./db";
 import { error } from "./http";
-import { adminCreateUser } from "./routes/admin";
+import { adminCreateUser, adminDeleteUser } from "./routes/admin";
 import { login, logout, me, register } from "./routes/auth";
 
 type Handler = (req: Request) => Response | Promise<Response>;
@@ -12,6 +12,7 @@ const routes: Record<string, Handler> = {
   "POST /api/auth/logout": logout,
   "GET /api/auth/me": me,
   "POST /api/admin/users": adminCreateUser,
+  "DELETE /api/admin/users": adminDeleteUser,
 };
 
 async function handle(req: Request): Promise<Response> {
@@ -32,8 +33,14 @@ function withCors(req: Request, res: Response): Response {
   const origin = req.headers.get("origin");
   if (origin && config.corsOrigins.includes(origin)) {
     res.headers.set("Access-Control-Allow-Origin", origin);
-    res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, DELETE, OPTIONS",
+    );
+    res.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization",
+    );
     res.headers.append("Vary", "Origin");
   }
   return res;
@@ -52,5 +59,7 @@ setInterval(purgeExpiredSessions, 60 * 60 * 1000);
 
 console.log(`API listening on http://localhost:${config.port}`);
 if (!adminExists()) {
-  console.warn("No admin user yet. Create one with: bun run create-admin <username>");
+  console.warn(
+    "No admin user yet. Create one with: bun run create-admin <username>",
+  );
 }
