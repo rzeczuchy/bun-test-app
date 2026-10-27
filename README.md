@@ -24,33 +24,6 @@ bunx playwright show-report      # open the HTML report after a run
 
 ## API
 
-| Method | Path                 | Auth                            | Purpose                                                            |
-| ------ | -------------------- | ------------------------------- | ------------------------------------------------------------------ |
-| POST   | `/api/auth/login`    | none                            | `{username, password}` returns `{accessToken, expiresAt, user}`    |
-| POST   | `/api/auth/register` | none                            | Self-registration (disable with `ALLOW_PUBLIC_REGISTRATION=false`) |
-| GET    | `/api/auth/me`       | Bearer token                    | Current user, used by the Lobby guard                              |
-| POST   | `/api/auth/logout`   | Bearer token                    | Revokes the token                                                  |
-| POST   | `/api/admin/users`   | Basic (admin username:password) | Admin registers a user, body `{username, password}`                |
+API is documented in `backend/openapi.yaml`. An external script is used to parse the OpenAPI spec into `backend/apidocs.html`.
 
-Example (admin creating a user):
-
-```bash
-curl -u admin:ADMIN_PASSWORD -H "Content-Type: application/json" \
-  -d '{"username":"alice","password":"correct-horse"}' \
-  http://localhost:3001/api/admin/users
-```
-
-## Layout
-
-```bash
-backend/
-  src/index.ts          server, routing, CORS
-  src/routes/           HTTP handlers (auth, admin)
-  src/auth.ts           passwords, tokens, Bearer/Basic auth
-  src/db.ts             SQLite schema and queries
-  src/validation.ts     input rules
-  scripts/create-admin.ts
-frontend/
-  serve.ts              static dev server
-  public/               pages, css, js (api.js talks to the backend, session.js stores the token)
-```
+The `bruno` folder contains a Bruno collection for manually testing the API.
