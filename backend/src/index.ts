@@ -1,7 +1,11 @@
 import { config } from "./config";
 import { adminExists, purgeExpiredSessions } from "./db";
 import { error } from "./http";
-import { adminCreateUser, adminDeleteUser } from "./routes/admin";
+import {
+  adminCreateUser,
+  adminDeleteUser,
+  adminListUsers,
+} from "./routes/admin";
 import { login, logout, me, register } from "./routes/auth";
 
 type Handler = (req: Request) => Response | Promise<Response>;
@@ -13,6 +17,7 @@ const routes: Record<string, Handler> = {
   "GET /api/auth/me": me,
   "POST /api/admin/users": adminCreateUser,
   "DELETE /api/admin/users": adminDeleteUser,
+  "GET /api/admin/users": adminListUsers,
 };
 
 async function handle(req: Request): Promise<Response> {

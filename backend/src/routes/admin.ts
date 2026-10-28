@@ -1,5 +1,5 @@
 import { authenticateBasic, registerUser } from "../auth";
-import { deleteUserByUsername } from "../db";
+import { deleteUserByUsername, listUsers } from "../db";
 import { error, json, readJson } from "../http";
 
 async function requireAdmin(req: Request): Promise<Response | null> {
@@ -34,4 +34,11 @@ export async function adminDeleteUser(req: Request) {
     case "is_admin":
       return error("Admin accounts cannot be deleted", 403);
   }
+}
+
+export async function adminListUsers(req: Request) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
+  return json({ users: listUsers() });
 }

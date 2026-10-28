@@ -139,6 +139,39 @@ paths:
           description: Token revoked (or there was nothing to revoke)
 
   /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: List all users
+      description: |
+        Returns every registered user (id, username and role, never passwords).
+        Must be authorized with the admin's username and password (HTTP Basic auth).
+      operationId: adminListUsers
+      security:
+        - basicAuth: []
+      responses:
+        "200":
+          description: All users, ordered by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+        "401":
+          description: Missing or wrong admin credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Admin credentials required (HTTP Basic auth)
+        "403":
+          description: The credentials are valid, but the user is not an admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Forbidden
+
     post:
       tags: [Admin]
       summary: Register a user as admin
@@ -297,6 +330,15 @@ components:
       properties:
         user:
           $ref: "#/components/schemas/User"
+
+    UserListResponse:
+      type: object
+      required: [users]
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
 
     LoginResponse:
       type: object

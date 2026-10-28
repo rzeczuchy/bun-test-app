@@ -53,6 +53,12 @@ export function findUserByUsername(username: string): UserWithHash | null {
   return (row as UserWithHash | null) ?? null;
 }
 
+export function listUsers(): User[] {
+  return db
+    .query("SELECT id, username, role FROM users ORDER BY id")
+    .all() as User[];
+}
+
 export function createUser(
   username: string,
   passwordHash: string,
