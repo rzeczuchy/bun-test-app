@@ -4,6 +4,7 @@ import { error } from "./http";
 import {
   adminCreateUser,
   adminDeleteUser,
+  adminGetUser,
   adminListUsers,
 } from "./routes/admin";
 import { login, logout, me, register } from "./routes/auth";
@@ -15,9 +16,10 @@ const routes: Record<string, Handler> = {
   "POST /api/auth/register": register,
   "POST /api/auth/logout": logout,
   "GET /api/auth/me": me,
-  "POST /api/admin/users": adminCreateUser,
-  "DELETE /api/admin/users": adminDeleteUser,
   "GET /api/admin/users": adminListUsers,
+  "GET /api/admin/user": adminGetUser,
+  "POST /api/admin/user": adminCreateUser,
+  "DELETE /api/admin/user": adminDeleteUser,
 };
 
 async function handle(req: Request): Promise<Response> {

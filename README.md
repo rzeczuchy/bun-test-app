@@ -16,6 +16,8 @@ Configuration is optional, see `backend/.env.example`.
 
 ## Testing
 
+Playwright tests are stored in the `e2e` folder. Run with following:
+
 ```bash
 bun run test:e2e                 # headless run
 bunx playwright test --ui        # interactive UI, handy while writing tests

@@ -4,7 +4,7 @@ import {
   createUser,
   deleteSession,
   findUserBySession,
-  findUserByUsername,
+  getUserWithHashByUsername,
   type User,
 } from "./db";
 import { parseNewUser } from "./validation";
@@ -17,7 +17,7 @@ export const hashPassword = (password: string) => Bun.password.hash(password); /
 const DUMMY_HASH = await Bun.password.hash("not-a-real-password");
 
 export async function verifyCredentials(username: string, password: string): Promise<User | null> {
-  const row = findUserByUsername(username);
+  const row = getUserWithHashByUsername(username);
   const valid = await Bun.password.verify(password, row?.password_hash ?? DUMMY_HASH);
   return row && valid ? { id: row.id, username: row.username, role: row.role } : null;
 }
@@ -28,7 +28,7 @@ export async function registerUser(
 ): Promise<{ user: User } | { error: string; status: 400 | 409 }> {
   const input = parseNewUser(body);
   if ("error" in input) return { error: input.error, status: 400 };
-  if (findUserByUsername(input.username)) return { error: "Username is already taken", status: 409 };
+  if (getUserWithHashByUsername(input.username)) return { error: "Username is already taken", status: 409 };
 
   return { user: createUser(input.username, await hashPassword(input.password), "user") };
 }

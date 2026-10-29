@@ -1,11 +1,15 @@
 info:
-  name: Get-users
+  name: Cleanup-test-user copy
   type: http
-  seq: 3
+  seq: 1
 
 http:
-  method: GET
-  url: "{{baseUrl}}/api/admin/users"
+  method: DELETE
+  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
+  params:
+    - name: username
+      value: "{{testUser}}"
+      type: query
   auth:
     type: basic
     username: "{{adminUser}}"

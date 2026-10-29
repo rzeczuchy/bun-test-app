@@ -1,5 +1,5 @@
 import { authenticateBasic, registerUser } from "../auth";
-import { deleteUserByUsername, listUsers } from "../db";
+import { deleteUserByUsername, getUserByUsername, listUsers } from "../db";
 import { error, json, readJson } from "../http";
 
 async function requireAdmin(req: Request): Promise<Response | null> {
@@ -34,6 +34,17 @@ export async function adminDeleteUser(req: Request) {
     case "is_admin":
       return error("Admin accounts cannot be deleted", 403);
   }
+}
+
+export async function adminGetUser(req: Request) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
+  const username = new URL(req.url).searchParams.get("username");
+  if (!username) return error("Query parameter 'username' is required", 400);
+
+  const user = getUserByUsername(username);
+  return user ? json({ user }) : error("User not found", 404);
 }
 
 export async function adminListUsers(req: Request) {

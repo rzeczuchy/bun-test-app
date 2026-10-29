@@ -1,11 +1,11 @@
 info:
   name: Create-user (non-admin)
   type: http
-  seq: 4
+  seq: 3
 
 http:
   method: POST
-  url: "{{baseUrl}}/api/admin/users"
+  url: "{{baseUrl}}/api/admin/user"
   body:
     type: json
     data: |-
@@ -17,6 +17,14 @@ http:
     type: basic
     username: not-admin-user
     password: somepass123
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        test("status code is 401", function() {
+          expect(res.getStatus()).to.equal(401);
+        });
 
 settings:
   encodeUrl: true

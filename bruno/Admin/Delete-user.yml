@@ -1,11 +1,11 @@
 info:
   name: Delete-user
   type: http
-  seq: 1
+  seq: 5
 
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/admin/users?username={{testUser}}"
+  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
   params:
     - name: username
       value: "{{testUser}}"
@@ -14,6 +14,14 @@ http:
     type: basic
     username: "{{adminUser}}"
     password: "{{adminPassword}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 204", function() {
+          expect(res.getStatus()).to.equal(204);
+        });
 
 settings:
   encodeUrl: true

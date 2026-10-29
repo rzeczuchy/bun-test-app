@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: "{{baseUrl}}/api/admin/users"
+  url: "{{baseUrl}}/api/admin/user"
   body:
     type: json
     data: |-
@@ -17,6 +17,22 @@ http:
     type: basic
     username: "{{adminUser}}"
     password: "{{adminPassword}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("body is JSON", function () {
+          expect(res.getBody()).to.have.jsonBody();
+        });
+
+        test("content-type header is application/json", function () {
+          expect(res.getHeader("content-type")).to.include("application/json");
+        });
 
 settings:
   encodeUrl: true

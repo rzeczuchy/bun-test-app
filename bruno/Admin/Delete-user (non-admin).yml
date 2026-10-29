@@ -1,11 +1,11 @@
 info:
   name: Delete-user (non-admin)
   type: http
-  seq: 5
+  seq: 6
 
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/admin/users?username={{testUser}}"
+  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
   params:
     - name: username
       value: "{{testUser}}"
@@ -14,6 +14,14 @@ http:
     type: basic
     username: not-admin-user
     password: somepass123
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 401", function() {
+          expect(res.getStatus()).to.equal(401);
+        });
 
 settings:
   encodeUrl: true

@@ -1,0 +1,39 @@
+info:
+  name: Get-user
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
+  params:
+    - name: username
+      value: "{{testUser}}"
+      type: query
+  auth:
+    type: basic
+    username: "{{adminUser}}"
+    password: "{{adminPassword}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 200", function() {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("body is JSON", function () {
+          expect(res.getBody()).to.have.jsonBody();
+        });
+
+        test("content-type header is application/json", function () {
+          expect(res.getHeader("content-type")).to.include("application/json");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

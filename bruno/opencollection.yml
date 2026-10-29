@@ -2,6 +2,25 @@ opencollection: 1.0.0
 
 info:
   name: bun-test-app
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  scripts:
+    - type: tests
+      code: |-
+        test("response time is less than 1s", function() {
+          expect(res.responseTime).to.be.below(1000);
+        });
 bundled: false
 extensions:
   bruno:

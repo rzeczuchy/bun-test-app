@@ -44,13 +44,20 @@ const now = () => Math.floor(Date.now() / 1000);
 
 // ---- users ----
 
-export function findUserByUsername(username: string): UserWithHash | null {
+export function getUserWithHashByUsername(username: string): UserWithHash | null {
   const row = db
     .query(
       "SELECT id, username, role, password_hash FROM users WHERE username = ?",
     )
     .get(username);
   return (row as UserWithHash | null) ?? null;
+}
+
+export function getUserByUsername(username: string): User | null {
+  const row = db
+    .query("SELECT id, username, role FROM users WHERE username = ?")
+    .get(username);
+  return (row as User | null) ?? null;
 }
 
 export function listUsers(): User[] {
@@ -79,7 +86,7 @@ export function deleteUserByUsername(username: string): DeleteUserResult {
     .run(username);
 
   if (changes > 0) return "deleted";
-  return findUserByUsername(username) ? "is_admin" : "not_found";
+  return getUserWithHashByUsername(username) ? "is_admin" : "not_found";
 }
 
 export function upsertAdmin(username: string, passwordHash: string): void {
