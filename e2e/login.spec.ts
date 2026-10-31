@@ -34,6 +34,11 @@ test("shows the login form", async ({ page }) => {
 test("logs in and lands in the lobby", async ({ page }) => {
   await logIn(page);
   await expect(page).toHaveURL(/lobby\.html$/);
+  await expect(
+    page.getByRole("heading", { name: "Account settings" }),
+  ).toBeVisible();
+  await expect(page.locator("#username")).toHaveText(username);
+  await expect(page.locator("#role")).toHaveText("user");
   await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
 });
 

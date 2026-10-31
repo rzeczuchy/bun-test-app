@@ -2,6 +2,8 @@ import { getMe, logout } from "./api.js";
 import { clearToken, getToken } from "./session.js";
 
 const errorEl = document.querySelector("#error");
+const usernameEl = document.querySelector("#username");
+const roleEl = document.querySelector("#role");
 
 function goToLogin() {
   clearToken();
@@ -13,7 +15,9 @@ async function init() {
   if (!getToken()) return goToLogin();
 
   try {
-    await getMe();
+    const { user } = await getMe();
+    usernameEl.textContent = user.username;
+    roleEl.textContent = user.role;
   } catch (err) {
     if (err.status === 401) return goToLogin();
     errorEl.textContent = err.message;
