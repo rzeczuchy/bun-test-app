@@ -27,6 +27,21 @@ runtime:
           expect(res.getHeader("content-type")).to.include("application/json");
         });
 
+        test("created user is on the list", function () {
+          const username = bru.interpolate("{{create-user-username}}");
+          const users = res.getBody().users;
+
+          expect(users).to.be.an("array");
+
+          const found = users.find(
+            (u) => u.username.toLowerCase() === username.toLowerCase()
+          );
+
+          expect(found, `user "${username}" not found in the list`).to.not.be.undefined;
+          expect(found.role).to.equal("user");
+          expect(Number.isInteger(found.id)).to.equal(true);
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

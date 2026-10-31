@@ -1,0 +1,34 @@
+info:
+  name: Create-user (nonexistent)
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/admin/user"
+  body:
+    type: json
+    data: |-
+      {
+        "username": "someuser",
+        "password": "somepassword"
+      }
+  auth:
+    type: basic
+    username: "{{nonexistent-user}}"
+    password: "{{nonexistent-password}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 401", function() {
+          expect(res.getStatus()).to.equal(401);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

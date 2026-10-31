@@ -1,0 +1,31 @@
+info:
+  name: Delete-registered-user
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/admin/user?username={{registered-user-username}}"
+  params:
+    - name: username
+      value: "{{registered-user-username}}"
+      type: query
+  auth:
+    type: basic
+    username: "{{adminUser}}"
+    password: "{{adminPassword}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 204", function() {
+          expect(res.getStatus()).to.equal(204);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

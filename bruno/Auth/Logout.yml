@@ -1,14 +1,14 @@
 info:
   name: Logout
   type: http
-  seq: 5
+  seq: 4
 
 http:
   method: POST
   url: "{{baseUrl}}/api/auth/logout"
   auth:
     type: bearer
-    token: "{{testAccessToken}}"
+    token: "{{registered-user-access-token}}"
 
 settings:
   encodeUrl: true

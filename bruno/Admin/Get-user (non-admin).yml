@@ -1,0 +1,39 @@
+info:
+  name: Get-user (non-admin)
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
+  params:
+    - name: username
+      value: "{{testUser}}"
+      type: query
+  auth:
+    type: basic
+    username: "{{create-user-username}}"
+    password: "{{create-user-password}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("status code is 403", function() {
+          expect(res.getStatus()).to.equal(403);
+        });
+
+        test("body is JSON", function () {
+          expect(res.getBody()).to.have.jsonBody();
+        });
+
+        test("content-type header is application/json", function () {
+          expect(res.getHeader("content-type")).to.include("application/json");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

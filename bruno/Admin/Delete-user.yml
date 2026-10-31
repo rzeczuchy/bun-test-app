@@ -1,14 +1,14 @@
 info:
   name: Delete-user
   type: http
-  seq: 5
+  seq: 8
 
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
+  url: "{{baseUrl}}/api/admin/user?username={{create-user-username}}"
   params:
     - name: username
-      value: "{{testUser}}"
+      value: "{{create-user-username}}"
       type: query
   auth:
     type: basic

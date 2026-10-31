@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/api/admin/user?username={{testUser}}"
+  url: "{{baseUrl}}/api/admin/user?username={{create-user-username}}"
   params:
     - name: username
-      value: "{{testUser}}"
+      value: "{{create-user-username}}"
       type: query
   auth:
     type: basic

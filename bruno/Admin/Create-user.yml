@@ -1,7 +1,7 @@
 info:
   name: Create-user
   type: http
-  seq: 2
+  seq: 1
 
 http:
   method: POST
@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "username": "{{testUser}}",
-        "password": "{{testPassword}}"
+        "username": "qa_{{$timestamp}}",
+        "password": "{{create-user-password}}"
       }
   auth:
     type: basic
@@ -20,6 +20,13 @@ http:
 
 runtime:
   scripts:
+    - type: before-request
+      code: bru.setVar("create-user-password", "smacko-123");
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setVar("create-user-username", res.getBody().user.username);  
+        }
     - type: tests
       code: |-
         test("status code is 201", function() {

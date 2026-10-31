@@ -1,7 +1,7 @@
 info:
   name: Create-user (non-admin)
   type: http
-  seq: 3
+  seq: 2
 
 http:
   method: POST
@@ -10,20 +10,20 @@ http:
     type: json
     data: |-
       {
-        "username": "{{testUser}}",
-        "password": "{{testPassword}}"
+        "username": "someuser",
+        "password": "somepassword"
       }
   auth:
     type: basic
-    username: not-admin-user
-    password: somepass123
+    username: "{{create-user-username}}"
+    password: "{{create-user-password}}"
 
 runtime:
   scripts:
-    - type: after-response
+    - type: tests
       code: |-
-        test("status code is 401", function() {
-          expect(res.getStatus()).to.equal(401);
+        test("status code is 403", function() {
+          expect(res.getStatus()).to.equal(403);
         });
 
 settings:

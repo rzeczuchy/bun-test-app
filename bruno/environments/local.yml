@@ -3,12 +3,14 @@ variables:
   - name: baseUrl
     value: http://localhost:3001
   - secret: true
-    name: testUser
-  - secret: true
-    name: testPassword
-  - secret: true
-    name: testAccessToken
-  - secret: true
     name: adminUser
+    description: ""
   - secret: true
     name: adminPassword
+    description: ""
+  - secret: true
+    name: nonexistent-user
+    description: ""
+  - secret: true
+    name: nonexistent-password
+    description: ""

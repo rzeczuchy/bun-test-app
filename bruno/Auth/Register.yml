@@ -1,7 +1,7 @@
 info:
   name: Register
   type: http
-  seq: 2
+  seq: 1
 
 http:
   method: POST
@@ -10,10 +10,33 @@ http:
     type: json
     data: |-
       {
-        "username": "{{testUser}}",
-        "password": "{{testPassword}}"
+        "username": "qa_{{$timestamp}}",
+        "password": "{{registered-user-password}}"
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: bru.setVar("registered-user-password", "deep-sinking-2");
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 201) {
+          bru.setVar("registered-user-username", res.getBody().user.username);  
+        }
+    - type: tests
+      code: |-
+        test("status code is 201", function() {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("body is JSON", function () {
+          expect(res.getBody()).to.have.jsonBody();
+        });
+
+        test("content-type header is application/json", function () {
+          expect(res.getHeader("content-type")).to.include("application/json");
+        });
 
 settings:
   encodeUrl: true
