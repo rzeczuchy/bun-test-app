@@ -1,7 +1,7 @@
 info:
   name: Get-user (non-admin)
   type: http
-  seq: 5
+  seq: 6
 
 http:
   method: GET
@@ -11,9 +11,8 @@ http:
       value: "{{testUser}}"
       type: query
   auth:
-    type: basic
-    username: "{{create-user-username}}"
-    password: "{{create-user-password}}"
+    type: bearer
+    token: "{{registered-user-access-token}}"
 
 runtime:
   scripts:

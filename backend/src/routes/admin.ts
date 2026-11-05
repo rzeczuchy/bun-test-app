@@ -1,16 +1,16 @@
-import { authenticateBasic, registerUser } from "../auth";
+import { authenticateBearer, registerUser } from "../auth";
 import { deleteUserByUsername, getUserByUsername, listUsers } from "../db";
 import { error, json, readJson } from "../http";
 
-async function requireAdmin(req: Request): Promise<Response | null> {
-  const user = await authenticateBasic(req);
-  if (!user) return error("Admin credentials required (HTTP Basic auth)", 401);
+function requireAdmin(req: Request): Response | null {
+  const user = authenticateBearer(req);
+  if (!user) return error("Unauthorized", 401);
   if (user.role !== "admin") return error("Forbidden", 403);
   return null;
 }
 
 export async function adminCreateUser(req: Request) {
-  const denied = await requireAdmin(req);
+  const denied = requireAdmin(req);
   if (denied) return denied;
 
   const result = await registerUser(await readJson(req));
@@ -20,7 +20,7 @@ export async function adminCreateUser(req: Request) {
 }
 
 export async function adminDeleteUser(req: Request) {
-  const denied = await requireAdmin(req);
+  const denied = requireAdmin(req);
   if (denied) return denied;
 
   const username = new URL(req.url).searchParams.get("username");
@@ -37,7 +37,7 @@ export async function adminDeleteUser(req: Request) {
 }
 
 export async function adminGetUser(req: Request) {
-  const denied = await requireAdmin(req);
+  const denied = requireAdmin(req);
   if (denied) return denied;
 
   const username = new URL(req.url).searchParams.get("username");
@@ -48,7 +48,7 @@ export async function adminGetUser(req: Request) {
 }
 
 export async function adminListUsers(req: Request) {
-  const denied = await requireAdmin(req);
+  const denied = requireAdmin(req);
   if (denied) return denied;
 
   return json({ users: listUsers() });

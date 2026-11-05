@@ -1,7 +1,7 @@
 info:
   name: Get-user (nonexistent)
   type: http
-  seq: 6
+  seq: 7
 
 http:
   method: GET
@@ -11,9 +11,8 @@ http:
       value: "{{testUser}}"
       type: query
   auth:
-    type: basic
-    username: "{{nonexistent-user}}"
-    password: "{{nonexistent-password}}"
+    type: bearer
+    token: "{{$randomUUID}}"
 
 runtime:
   scripts:

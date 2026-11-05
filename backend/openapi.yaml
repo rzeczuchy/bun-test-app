@@ -10,8 +10,6 @@ info:
 
     - Log in with `POST /api/auth/login` to get an access token, then send it as
       `Authorization: Bearer <token>`.
-    - `POST /api/admin/user` does not use a token. It takes the admin's username and
-      password as HTTP Basic auth.
 
 servers:
   - url: http://localhost:3001
@@ -144,10 +142,9 @@ paths:
       summary: Get a user by username
       description: |
         Returns a single user (id, username and role, never the password).
-        Must be authorized with the admin's username and password (HTTP Basic auth).
       operationId: adminGetUser
       security:
-        - basicAuth: []
+        - bearerAuth: []
       parameters:
         - name: username
           in: query
@@ -172,13 +169,13 @@ paths:
               example:
                 error: Query parameter 'username' is required
         "401":
-          description: Missing or wrong admin credentials
+          description: Incorrect token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                error: Admin credentials required (HTTP Basic auth)
+                error: Must provide an admin token
         "403":
           description: The credentials are valid, but the user is not an admin
           content:
@@ -200,12 +197,11 @@ paths:
       tags: [Admin]
       summary: Register a user as admin
       description: |
-        Creates a regular user account. The request must be authorized with the
-        admin's username and password (HTTP Basic auth). Works even when public
+        Creates a regular user account. Requires admin level permissions. Works even when public
         registration is disabled.
       operationId: adminCreateUser
       security:
-        - basicAuth: []
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -225,13 +221,13 @@ paths:
         "400":
           $ref: "#/components/responses/ValidationError"
         "401":
-          description: Missing or wrong admin credentials
+          description: Incorrect token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                error: Admin credentials required (HTTP Basic auth)
+                error: Must provide an admin token
         "403":
           description: The credentials are valid, but the user is not an admin
           content:
@@ -251,10 +247,10 @@ paths:
       description: |
         Deletes the account named in the `username` query parameter, together with
         all of that user's active access tokens. Admin accounts cannot be deleted.
-        Must be authorized with the admin's username and password (HTTP Basic auth).
+        Requires admin level permissions.
       operationId: adminDeleteUser
       security:
-        - basicAuth: []
+        - bearerAuth: []
       parameters:
         - name: username
           in: query
@@ -274,13 +270,13 @@ paths:
               example:
                 error: Query parameter 'username' is required
         "401":
-          description: Missing or wrong admin credentials
+          description: Incorrect token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                error: Admin credentials required (HTTP Basic auth)
+                error: Must provide an admin token
         "403":
           description: The credentials are valid but not an admin's, or the target is an admin account
           content:
@@ -304,10 +300,10 @@ paths:
       summary: List all users
       description: |
         Returns every registered user (id, username and role, never passwords).
-        Must be authorized with the admin's username and password (HTTP Basic auth).
+        Requires admin level permissions.
       operationId: adminListUsers
       security:
-        - basicAuth: []
+        - bearerAuth: []
       responses:
         "200":
           description: All users, ordered by id
@@ -316,13 +312,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserListResponse"
         "401":
-          description: Missing or wrong admin credentials
+          description: Incorrect token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                error: Admin credentials required (HTTP Basic auth)
+                error: Must provide an admin token
         "403":
           description: The credentials are valid, but the user is not an admin
           content:
@@ -338,10 +334,6 @@ components:
       type: http
       scheme: bearer
       description: Access token returned by `POST /api/auth/login`.
-    basicAuth:
-      type: http
-      scheme: basic
-      description: Admin username and password.
 
   schemas:
     LoginRequest:

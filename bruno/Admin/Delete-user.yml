@@ -1,7 +1,7 @@
 info:
   name: Delete-user
   type: http
-  seq: 8
+  seq: 9
 
 http:
   method: DELETE
@@ -11,9 +11,8 @@ http:
       value: "{{create-user-username}}"
       type: query
   auth:
-    type: basic
-    username: "{{adminUser}}"
-    password: "{{adminPassword}}"
+    type: bearer
+    token: "{{admin-access-token}}"
 
 runtime:
   scripts:

@@ -1,7 +1,7 @@
 info:
   name: Create-user
   type: http
-  seq: 1
+  seq: 2
 
 http:
   method: POST
@@ -14,9 +14,8 @@ http:
         "password": "{{create-user-password}}"
       }
   auth:
-    type: basic
-    username: "{{adminUser}}"
-    password: "{{adminPassword}}"
+    type: bearer
+    token: "{{admin-access-token}}"
 
 runtime:
   scripts:
@@ -25,7 +24,7 @@ runtime:
     - type: after-response
       code: |-
         if (res.getStatus() === 201) {
-          bru.setVar("create-user-username", res.getBody().user.username);  
+          bru.setVar("create-user-username", res.getBody().user.username);
         }
     - type: tests
       code: |-

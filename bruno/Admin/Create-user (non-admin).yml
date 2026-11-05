@@ -1,7 +1,7 @@
 info:
   name: Create-user (non-admin)
   type: http
-  seq: 2
+  seq: 3
 
 http:
   method: POST
@@ -14,9 +14,8 @@ http:
         "password": "somepassword"
       }
   auth:
-    type: basic
-    username: "{{create-user-username}}"
-    password: "{{create-user-password}}"
+    type: bearer
+    token: "{{registered-user-access-token}}"
 
 runtime:
   scripts:

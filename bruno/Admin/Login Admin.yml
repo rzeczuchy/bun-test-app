@@ -1,0 +1,87 @@
+info:
+  name: Login Admin
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "username": "{{adminUser}}",
+        "password": "{{adminPassword}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 200) {
+          bru.setVar("admin-access-token", res.getBody().accessToken);
+        }
+    - type: tests
+      code: |-
+        const body = res.getBody();
+
+        test("status code is 200", function () {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("content-type header is application/json", function () {
+          expect(res.getHeader("content-type")).to.include("application/json");
+        });
+
+        test("body has exactly the documented top-level fields", function () {
+          expect(body).to.have.all.keys("accessToken", "tokenType", "expiresAt", "user");
+        });
+
+        test("accessToken is a non-empty string without whitespace", function () {
+          expect(body.accessToken).to.be.a("string");
+          expect(body.accessToken).to.have.length.above(0);
+          expect(body.accessToken).to.not.match(/\s/);
+        });
+
+        test("tokenType is Bearer", function () {
+          expect(body.tokenType).to.equal("Bearer");
+        });
+
+        test("expiresAt is an integer Unix timestamp in seconds, in the future", function () {
+          const now = Math.floor(Date.now() / 1000);
+          expect(body.expiresAt).to.be.a("number");
+          expect(Number.isInteger(body.expiresAt)).to.equal(true);
+          expect(body.expiresAt).to.be.above(now);
+          // sanity upper bound: catches milliseconds instead of seconds; adjust to your real token lifetime
+          expect(body.expiresAt).to.be.below(now + 365 * 24 * 3600);
+        });
+
+        test("user has exactly id, username and role", function () {
+          expect(body.user).to.have.all.keys("id", "username", "role");
+        });
+
+        test("user fields have the right types and values", function () {
+          expect(Number.isInteger(body.user.id)).to.equal(true);
+          expect(body.user.id).to.be.above(0);
+          expect(body.user.username).to.be.a("string");
+          expect(body.user.username.toLowerCase()).to.be.a("string");
+          expect(body.user.role).to.be.oneOf(["user", "admin"]);
+        });
+
+        test("registered test user has the role 'user'", function () {
+          expect(body.user.role).to.equal("admin");
+        });
+
+        test("response does not leak the password", function () {
+          const raw = JSON.stringify(body);
+          expect(raw).to.not.match(/password/i);
+          expect(raw).to.not.include(String(bru.getVar("registered-user-password")));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

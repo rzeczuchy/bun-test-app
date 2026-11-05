@@ -1,7 +1,7 @@
 info:
   name: Delete-user (non-admin)
   type: http
-  seq: 9
+  seq: 10
 
 http:
   method: DELETE
@@ -11,9 +11,8 @@ http:
       value: "{{testUser}}"
       type: query
   auth:
-    type: basic
-    username: not-admin-user
-    password: somepass123
+    type: bearer
+    token: "{{$randomUUID}}"
 
 runtime:
   scripts:

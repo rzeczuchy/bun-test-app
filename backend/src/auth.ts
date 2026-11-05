@@ -52,16 +52,3 @@ export function authenticateBearer(req: Request): User | null {
   const token = getBearerToken(req);
   return token ? findUserBySession(sha256(token)) : null;
 }
-
-// ---- HTTP Basic (used only by the admin endpoint) ----
-
-export async function authenticateBasic(req: Request): Promise<User | null> {
-  const encoded = req.headers.get("authorization")?.match(/^Basic\s+(\S+)$/i)?.[1];
-  if (!encoded) return null;
-
-  const decoded = Buffer.from(encoded, "base64").toString("utf8");
-  const separator = decoded.indexOf(":");
-  if (separator < 1) return null;
-
-  return verifyCredentials(decoded.slice(0, separator), decoded.slice(separator + 1));
-}

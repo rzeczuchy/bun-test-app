@@ -1,7 +1,7 @@
 info:
   name: Create-user (nonexistent)
   type: http
-  seq: 3
+  seq: 4
 
 http:
   method: POST
@@ -14,9 +14,8 @@ http:
         "password": "somepassword"
       }
   auth:
-    type: basic
-    username: "{{nonexistent-user}}"
-    password: "{{nonexistent-password}}"
+    type: bearer
+    token: "{{$randomUUID}}"
 
 runtime:
   scripts:
