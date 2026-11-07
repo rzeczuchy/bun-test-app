@@ -26,7 +26,10 @@ paths:
     post:
       tags: [Auth]
       summary: Log in
-      description: Exchanges a username and password for an access token.
+      description: |
+        Exchanges a username and password for an access token.
+
+        Rate limited: too many attempts return 429.
       operationId: login
       requestBody:
         required: true
@@ -62,6 +65,8 @@ paths:
                 error: Invalid username or password
         "413":
           $ref: "#/components/responses/PayloadTooLarge"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /api/auth/register:
     post:
@@ -71,6 +76,8 @@ paths:
         Creates a regular user account. Can be switched off on the server with
         `ALLOW_PUBLIC_REGISTRATION=false`, in which case it returns 403.
         Usernames are case-insensitive.
+
+        Rate limited: too many attempts per hour from one IP address return 429.
       operationId: register
       requestBody:
         required: true
@@ -102,6 +109,8 @@ paths:
           $ref: "#/components/responses/UsernameTaken"
         "413":
           $ref: "#/components/responses/PayloadTooLarge"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /api/auth/me:
     get:
@@ -444,3 +453,18 @@ components:
 
     PayloadTooLarge:
       description: Request body is larger than 16 KB. Rejected by the server before it reaches the API code, so there is no JSON body.
+
+    TooManyRequests:
+      description: Too many attempts from this client. Wait for the number of seconds in the `Retry-After` header before trying again.
+      headers:
+        Retry-After:
+          description: Seconds until the client may try again.
+          schema:
+            type: integer
+            example: 540
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Too many attempts. Try again in 540s.
