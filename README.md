@@ -2,6 +2,25 @@
 
 Monorepo with a Bun + SQLite REST API (`backend/`) and a plain HTML/CSS/JS frontend (`frontend/`).
 
+Mostly made to learn Bun runtime, plus some concepts around authentication and authorization.
+
+The app implements:
+
+- login page
+- backend API with access token auth
+- admin endpoints for user management
+- rate limiting for login and registration endpoints
+
+Some shortcuts taken during implementation:
+
+- the backend uses an SQLite database
+- no email verification
+
+Mistakes to learn from:
+
+1. The backend and frontend have different origin, and CORS is implemented. For a tiny app like this with only one frontend I should have gone with a single origin, enable same-origin policy and omit CORS.
+2. I did not plan out all the API endpoints in advance, and ended up having to make a few awkward decisions later on when it comes to routing.
+
 ## Run
 
 ```bash
